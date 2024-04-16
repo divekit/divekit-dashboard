@@ -26,22 +26,32 @@
   height: 100%;
 }
 
-.query-input {
-  margin-left: auto;
+.student-row td {
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
-.student-row {
-  padding-top: 10px;
+.student-row:hover td {
+  background-color: rgba(148, 148, 148, 0.3);
 }
 
-.table tr:hover {
-  background-color: rgba(148, 148, 148, 0.1) !important;
+.selected-row {
+  filter: brightness(85%);
 }
 
 .student-table {
   max-height: 400px;
   overflow-y: scroll;
   border-radius: 6px;
+}
+
+.student-detail {
+  text-align: left;
+  background-color: #fff;
+  margin-right: 1%;
+  box-shadow: 0px 0px 10px lightgray;
+  padding: 10px 60px;
+  margin: 10px;
 }
 
 .test-overview {
@@ -56,6 +66,7 @@
   top: -10px;
   background-color: white;
   padding: 20px;
+  z-index: 1;
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
 }
 
@@ -96,10 +107,77 @@
   background: rgba(0,0,0,0.104);
 }
 
-/* .bar-chart {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-right: 70vw;
-} */
+/* buttons */
+button {
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #5DC6F4;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 18px;
+  padding: 4px;
+  width: 50px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
+
+button span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  /* transform: scale(1.03);  */
+  background-color: #4AACF8;
+}
+
+/**/
+
+.input {
+  text-align: left;
+  border-radius: 4px;
+  border: 1px solid #C3CCCD;
+  padding: 5px 5px 5px 2px;
+  margin-left: 5px;
+}
+
+*:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.milestone-source {
+  margin-left: auto;
+  margin-right: 10px;
+}
+
+.nav-bar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px lightgray;
+  padding: 2px 10px;
+}
+
+.charts-overview {
+  margin: 10px;
+}
+
+.divekit-header {
+  text-decoration: underline;
+  text-decoration-color: #5DC6F4;
+  text-decoration-thickness: 4px;
+}

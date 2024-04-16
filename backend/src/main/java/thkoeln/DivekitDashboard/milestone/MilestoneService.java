@@ -1,20 +1,23 @@
 package thkoeln.DivekitDashboard.milestone;
 
 import org.springframework.stereotype.Service;
-import thkoeln.DivekitDashboard.milestone.Milestone;
+import thkoeln.DivekitDashboard.gitlab.GitlabService;
 import thkoeln.DivekitDashboard.student.Student;
-import thkoeln.DivekitDashboard.milestone.MilestoneRepository;
+import thkoeln.DivekitDashboard.student.StudentService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
 public class MilestoneService {
     private final MilestoneRepository milestoneRepository;
+    final GitlabService gitlabService;
+    final StudentService studentService;
 
-    public MilestoneService(MilestoneRepository milestoneRepository) {
+    public MilestoneService(MilestoneRepository milestoneRepository, GitlabService gitlabService, StudentService studentService) {
         this.milestoneRepository = milestoneRepository;
+        this.gitlabService = gitlabService;
+        this.studentService = studentService;
     }
 
     public void saveMilestoneFromOverview(String name, String source, List<Student> students){
@@ -23,7 +26,7 @@ public class MilestoneService {
         milestoneRepository.save(milestone);
     }
 
-    public Milestone getMilestoneById(long id){
+    public Milestone getMilestoneById(String id){
         return milestoneRepository.findById(id).orElseThrow(NoSuchElementException::new);
     }
 
@@ -32,10 +35,7 @@ public class MilestoneService {
     }
 
     public Iterable<String> getAllMilestoneSources(){
-        ArrayList<String> sources = new ArrayList<>();
-        milestoneRepository.findAll().forEach(milestone -> sources.add(milestone.getSource()));
-
-        return sources;
+        return milestoneRepository.getAllSources();
     }
 
     public boolean sourceExists(String source) {
@@ -45,4 +45,6 @@ public class MilestoneService {
     public void removeMilestoneSource(String source){
         milestoneRepository.deleteAllBySource(source);
     }
+
+
 }

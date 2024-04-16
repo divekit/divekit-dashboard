@@ -81,7 +81,7 @@ public class GitlabParser {
         return milestoneTests;
     }
 
-    public static List<MilestoneTest> testsFromGroup(String groupName, List<String> testElements) {
+    private static List<MilestoneTest> testsFromGroup(String groupName, List<String> testElements) {
         ArrayList<MilestoneTest> tests = new ArrayList<>();
 
         testElements.forEach(testElement -> {

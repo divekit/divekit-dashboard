@@ -1,0 +1,11 @@
+on: [push]
+
+jobs:
+  docker_compose_job:
+    name: Runs docker compose file for frontend and backend containers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hoverkraft-tech/compose-action@v2.0.0
+        with:
+          compose-file: "./docker-compose.yml"

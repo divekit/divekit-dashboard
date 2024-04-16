@@ -21,7 +21,6 @@ export interface IStudent {
 }
 
 export interface IMilestone {
-  id: number,
   name: string,
   students: IStudent[]
 }

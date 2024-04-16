@@ -1,4 +1,4 @@
-import { IMilestone, IStudent } from "../rest/types";
+import { IStudent } from "../rest/types";
 
 type commitDataPoint = {
   id: string;

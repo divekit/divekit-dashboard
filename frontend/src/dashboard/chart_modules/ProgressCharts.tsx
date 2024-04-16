@@ -1,19 +1,18 @@
-import { Pie } from "@nivo/pie"
-import { getCommitFrequency, getProgressDistribution, getStudentProgress } from "../studentData"
-import { useContext } from "react";
-import { MilestoneContext, useMilestoneContext } from "../MilestoneContext";
-import { Bar, ResponsiveBar } from "@nivo/bar";
-import { Line, ResponsiveLine } from "@nivo/line";
-import { IMilestone } from "../../rest/types";
+import { getProgressDistribution, getStudentProgress } from "../chartData";
+import { useDashboardContext } from "../DashboardContext";
+import { ResponsiveBar } from "@nivo/bar";
+import { ResponsiveLine } from "@nivo/line";
 
 const colorScheme = ["#5fecff", "#5fe2fc", "#5ed9fa", "#5ecff7", "#5dc6f4", "#5bbcf1", "#59b3ef", "#57aaec", "#55a0e9", "#5297e6", "#4f8ee3", "#4b85e0", "#477cdd", "#4373da", "#3e6ad7", "#3861d4", "#3158d1", "#294fce", "#1f46cb", "#0f3dc8"]
 /*TODO: define color scheme only once somewhere else*/
 
 export function ProgressLineChart(){
-  const students = useMilestoneContext().students
+  const students = useDashboardContext().students
   return <ResponsiveLine
     data={getStudentProgress(students)}
     margin={{ top: 50, right: 10, bottom: 50, left: 60 }}
+    xFormat={(value) => value + "%"}
+    yFormat={(value) => value + " student(s)"}
     xScale={{ type: 'linear' }}
     yScale={{
         type: 'linear',
@@ -51,7 +50,7 @@ export function ProgressLineChart(){
 }
 
 export function ProgressBarChart() {
-  const students = useMilestoneContext().students
+  const students = useDashboardContext().students
   const progressDistribution = getProgressDistribution(students)
   return <div style={{height: 130, width: 400}}>
       <center><h4 style={{color: "#5297e6"}}>
@@ -66,6 +65,14 @@ export function ProgressBarChart() {
           ]}
           label={(data) => data.value + "%"}
           valueFormat={(value) => value + "%"}
+          // tooltip={ point => <div style={{fontSize: '12px'}}>{point.value}</div>}
+          tooltipLabel={(data) => {
+            if(data.id === "notStarted"){
+              return "not started"
+            } else {
+              return data.id + ""
+            }
+          }}
           margin={{ top: -20, right: 20, bottom: 50, left: 10 }}
           padding={0.2}
           layout="horizontal"
@@ -94,7 +101,7 @@ export function ProgressBarChart() {
                   ]
               ]
           }}
-          legendLabel={ (data) => {
+          legendLabel={(data) => {
             if(data.id === "notStarted"){
               return "not started"
             } else {

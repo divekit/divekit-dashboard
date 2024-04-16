@@ -37,19 +37,44 @@ public class GitlabService {
         gitLab = new GitLabApi(GITLAB_SERVER, GITLAB_SECRET);
     }
 
-    public List<Student> fetchStudentsFromOverview(RepositoryFile file) throws GitLabApiException, RuntimeException {
+    public RepositoryFile fetchMilestoneFile(String source) throws GitLabApiException {
+        String overviewPath = source.substring(0, source.lastIndexOf("/"));
+
+        return gitLab
+                .getRepositoryFileApi()
+                .getOptionalFile(overviewPath, source.replace(overviewPath + "/", ""), "master")
+                .orElseThrow(() -> new GitLabApiException("Could not get milestone file from source " + source + "."));
+    }
+
+    private List<String> fetchStudentCommits(Student student){
+        try {
+            String trimmedCodeRepoURL = student.getCodeRepoUrl().replace(GITLAB_SERVER + "/", "");
+            List<Commit> commits = gitLab.getCommitsApi().getCommits(trimmedCodeRepoURL);
+
+            // removes automatic initial commit as it's not made by students
+            commits.remove(0);
+
+            List<String> commitHashes = new ArrayList<>();
+            commits.forEach(commit -> commitHashes.add(commit.getId()));
+
+            return commitHashes;
+        } catch (GitLabApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<Student> createStudentsFromOverview(RepositoryFile file) throws GitLabApiException, RuntimeException {
         System.out.println("creating students...");
 
+        // GitLab GET-requests return files in Base64, so they need to be decoded
         byte[] decodedMdFile = Base64.getDecoder().decode(file.getContent());
         if(decodedMdFile == null || decodedMdFile.length == 0){
-            throw new GitLabApiException("Could not get decoded file content from repository file.");
+            throw new GitLabApiException("Could not decode file content from repository file.");
         }
 
         String mdString = new String(decodedMdFile, StandardCharsets.UTF_8);
         List<Student> students = GitlabParser.mdToStudentList(mdString);
-//       students = students.stream().limit(10).collect(Collectors.toList());
         applyTestsAndCommits(students);
-        System.out.println("done");
 
         return students;
     }
@@ -59,6 +84,8 @@ public class GitlabService {
 
         forEachAsync(students, student -> {
             student.setCommits(fetchStudentCommits(student));
+            // URLs to the test pages of students in student overview still start with http://,
+            // so they need to be redirected
             String testPageAsString = fetchHtmlString(student.getTestOverviewUrl().replace("http://", "https://"));
 
             if(testPageAsString == null){
@@ -82,7 +109,7 @@ public class GitlabService {
         });
     }
 
-    private <T> void forEachAsync(List<T> list, Consumer<T> func) {
+    public static <T> void forEachAsync(List<T> list, Consumer<T> func) {
         ExecutorService executorService = Executors.newFixedThreadPool(list.size());
         List<CompletableFuture<Void>> futures = new ArrayList<>();
 
@@ -94,42 +121,28 @@ public class GitlabService {
         executorService.shutdown();
     }
 
-    private List<String> fetchStudentCommits(Student student){
-        try {
-            String trimmedCodeRepoURL = student.getCodeRepoUrl().replace(GITLAB_SERVER + "/", "");
-            List<Commit> commits = gitLab.getCommitsApi().getCommits(trimmedCodeRepoURL);
-
-            // removes automatic inital commit as it's not made by students
-            commits.remove(0);
-
-            List<String> commitHashes = new ArrayList<>();
-            commits.forEach(commit -> commitHashes.add(commit.getId()));
-
-            return commitHashes;
-        } catch (GitLabApiException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private String fetchHtmlString(String htmlUrl, int count, int max) {
-        String content = null;
-        try {
-            URLConnection connection =  new URL(htmlUrl).openConnection();
-            Scanner scanner = new Scanner(connection.getInputStream());
-            scanner.useDelimiter("\\Z");
-            content = scanner.next();
-            scanner.close();
-        } catch (Exception ex) {
-            if(count > max){
-                return null;
+    private String fetchHtmlString(String htmlUrl, int max) {
+        for (int i = 0; i < max; i++) {
+            try {
+                URLConnection connection =  new URL(htmlUrl).openConnection();
+                Scanner scanner = new Scanner(connection.getInputStream());
+                scanner.useDelimiter("\\Z");
+                String content = scanner.next();
+                scanner.close();
+                return content;
+            } catch (Exception ex) {
+                if (i + 1 != max) {
+                    System.out.println("Retrying to fetch student test page...");
+                } else {
+                    System.out.println("Could not fetch student test page.");
+                }
             }
-            fetchHtmlString(htmlUrl, count + 1, max);
         }
-        return content;
+        return null;
     }
 
     private String fetchHtmlString(String htmlUrl) {
-        return fetchHtmlString(htmlUrl, 0, 5);
+        return fetchHtmlString(htmlUrl, 5);
     }
 
     public List<String> fetchMilestoneLink(String source) throws GitLabApiException {
@@ -141,14 +154,5 @@ public class GitlabService {
                 .stream()
                 .map(treeItem -> source + "/" + treeItem.getPath())
                 .toList();
-    }
-
-    public RepositoryFile fetchMilestoneFile(String source) throws GitLabApiException {
-        String overviewPath = source.substring(0, source.lastIndexOf("/"));
-
-        return  gitLab
-                .getRepositoryFileApi()
-                .getOptionalFile(overviewPath, source.replace(overviewPath + "/", ""), "master")
-                .orElseThrow(() -> new GitLabApiException("Could not get milestone file from source " + source + "."));
     }
 }
