@@ -131,7 +131,7 @@ each chart.
 - H2 memory database
 - GitLab4J API for working with the GitLab REST API
 
-![UML diagram](backend/src/main/resources/DivekitDashboard UML Diagram.png)
+![UML diagram](backend/src/main/resources/uml diagram.png)
 
 ### Frontend
 
