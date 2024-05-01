@@ -3,6 +3,7 @@ services:
     build:
       context: ./frontend/
       dockerfile: Dockerfile
+    image: lzinn/divekit-dashboard:frontend
     ports:
       - "3000:3000"
     dns:
@@ -11,7 +12,11 @@ services:
     build:
       context: ./backend/
       dockerfile: Dockerfile
+    image: lzinn/divekit-dashboard:backend
     ports:
       - "8080:8080"
     dns:
       - 8.8.8.8
+    environment:
+      - GITLAB_SERVER=${GITLAB_SERVER}   # default server is https://git.archi-lab.io
+      - GITLAB_TOKEN=${GITLAB_TOKEN}

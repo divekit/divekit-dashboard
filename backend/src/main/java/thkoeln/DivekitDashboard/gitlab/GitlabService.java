@@ -5,8 +5,6 @@ import org.gitlab4j.api.GitLabApi;
 import org.gitlab4j.api.GitLabApiException;
 import org.gitlab4j.api.models.Commit;
 import org.gitlab4j.api.models.RepositoryFile;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import thkoeln.DivekitDashboard.student.MilestoneTest;
 import thkoeln.DivekitDashboard.student.Student;
@@ -23,18 +21,24 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-@PropertySource("classpath:secrets.properties")
 @Service
 public class GitlabService {
-    private static final String GITLAB_SERVER = "https://git.archi-lab.io";
-    @Value("${gitlab-secret}")
-    private String GITLAB_SECRET;
+    private final String GITLAB_SERVER = getEnvServer();
+    private final String GITLAB_TOKEN = System.getenv("GITLAB_TOKEN") + "";
 
     private GitLabApi gitLab;
 
     @PostConstruct
     public void init() {
-        gitLab = new GitLabApi(GITLAB_SERVER, GITLAB_SECRET);
+        gitLab = new GitLabApi(GITLAB_SERVER, GITLAB_TOKEN);
+    }
+
+    private String getEnvServer() {
+        String server = System.getenv("GITLAB_SERVER") + "";
+        if (server.charAt(server.length() - 1) == '/') {
+            server = server.substring(0, server.length() - 1);
+        }
+        return server;
     }
 
     public RepositoryFile fetchMilestoneFile(String source) throws GitLabApiException {
@@ -66,7 +70,7 @@ public class GitlabService {
     public List<Student> createStudentsFromOverview(RepositoryFile file) throws GitLabApiException, RuntimeException {
         System.out.println("creating students...");
 
-        // GitLab GET-requests return files in Base64, so they need to be decoded
+        // GitLab GET requests return files in Base64, so they need to be decoded
         byte[] decodedMdFile = Base64.getDecoder().decode(file.getContent());
         if(decodedMdFile == null || decodedMdFile.length == 0){
             throw new GitLabApiException("Could not decode file content from repository file.");
@@ -84,7 +88,7 @@ public class GitlabService {
 
         forEachAsync(students, student -> {
             student.setCommits(fetchStudentCommits(student));
-            // URLs to the test pages of students in student overview still start with http://,
+            // URLs to the test pages of students in student overview start with http://,
             // so they need to be redirected
             String testPageAsString = fetchHtmlString(student.getTestOverviewUrl().replace("http://", "https://"));
 
@@ -94,7 +98,6 @@ public class GitlabService {
 
             ArrayList<MilestoneTest> milestoneTests = GitlabParser.htmlToTests(testPageAsString);
 
-            // TODO: error if first student of milestone has no tests, needs to be fixed
             if (milestoneTests.size() == 0) {
                 prevTests.forEach(prevTest -> milestoneTests.add(new MilestoneTest(
                         prevTest.getId(),

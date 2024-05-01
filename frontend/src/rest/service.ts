@@ -40,10 +40,19 @@ export async function fetchMilestoneSources(){
 }
 
 export async function requestRefresh(){
-  const response = await fetch(`http://localhost:8080/milestones/refresh`, {
+  let response;
+  try {
+    response = await fetch(`http://localhost:8080/milestones/refresh`, {
     method: 'GET'
   }) 
-  return response.json()
+  } catch (error) {
+    console.log(error)
+  }
+  if (response?.ok) {
+    return response.json()
+  } else {
+    return []
+  }
 }
 
 export function wait(delay: number){

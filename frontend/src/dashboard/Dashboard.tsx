@@ -128,7 +128,12 @@ function NavBar({setSelectedMilestone, milestones, fetchMilestonesAndUpdateChart
 
   function onRequestRefresh(){
     setisRefreshingMilestones(true)
-    requestRefresh().then(() => setisRefreshingMilestones(false))
+    requestRefresh().then((milestones) => {
+      setisRefreshingMilestones(false)
+      if (milestones.length === 0) {
+        toast(`Could not refresh current milestone data. Please try refreshing again if necessary.`)
+      }
+    })
   }
 
   return <div style={{backgroundColor: 'white', display:"flex", alignItems: "center"}} className="nav-bar">
