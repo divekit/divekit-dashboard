@@ -1,10 +1,14 @@
-import { useContext } from "react";
-import { DashboardContext, useDashboardContext } from "../DashboardContext";
-import { getProgressDistribution, getTestDistribution } from "../chartData";
-import { Bar, ResponsiveBar } from "@nivo/bar";
+import { ColorScheme } from "../../theme/schemes";
+import { useMilestoneContext, useStudentFilterContext } from "../DashboardContext";
+import { getStudentsByTestFinished, getTestDistribution } from "./chartData";
+import { ResponsiveBar } from "@nivo/bar";
 
 export function TestBarChartOverview(){
-  const students = useDashboardContext().students
+  const milestone = useMilestoneContext().get
+  if(!milestone){
+    return <></>
+  }
+  const students = milestone.students;
   const testCharts = []
   var currentGroup = ""
   var key = 0
@@ -24,12 +28,19 @@ export function TestBarChartOverview(){
 }
 
 export function TestBarChart({testNumber} : {testNumber: number}) { 
-  const students = useDashboardContext().students
+  const setFilteredStudents = useStudentFilterContext().setFilteredStudents
+  const students = useMilestoneContext().get?.students
+  if(!students) {
+    return <></>
+  }
   return <div>
     <h3 className="chart-header">{students[0].milestoneTests[testNumber].name}</h3>
     <div style={{height: 45, width: 400}}>
       <ResponsiveBar
         data={getTestDistribution(students, testNumber)}
+        onClick={(node) => {
+          setFilteredStudents(getStudentsByTestFinished(students, testNumber + 1, node.id === "finished"))
+        }}
         valueFormat={(value) => (value) + "%"}
         keys={[
           'unfinished',
@@ -43,7 +54,7 @@ export function TestBarChart({testNumber} : {testNumber: number}) {
         layout="horizontal"
         valueScale={{ type: 'linear' }}
         indexScale={{ type: 'band', round: true }}
-        colors={ ["#5297e6", "#5fecff"] }    
+        colors={ColorScheme.testBar}    
         borderColor={{
             from: 'color',
             modifiers: [

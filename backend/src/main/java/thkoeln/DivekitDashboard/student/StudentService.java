@@ -21,13 +21,8 @@ public class StudentService {
     }
 
     public List<Student> saveStudentsFromOverview(RepositoryFile file) throws GitLabApiException, RuntimeException {
-        Iterable<Student> students = studentRepository.saveAll(
+        return studentRepository.saveAll(
                 gitlabService.createStudentsFromOverview(file)
         );
-
-        return StreamSupport
-                .stream(students.spliterator(), false)
-                .toList();
     }
-
 }

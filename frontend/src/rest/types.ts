@@ -1,6 +1,7 @@
-export interface Commit {
+export interface ICommit {
   id: string,
-  date: Date
+  date: Date,
+  message: string
 }
 
 export interface IMilestoneTest {
@@ -17,10 +18,17 @@ export interface IStudent {
   testRepoUrl: string,
   testOverviewUrl: string,
   milestoneTests: IMilestoneTest[],
-  commits: String[]
+  commits: ICommit[]
 }
 
 export interface IMilestone {
   name: string,
   students: IStudent[]
 }
+
+export interface IUser {
+  id?: number,
+  email: string,
+  password: string,
+  name?: string
+};

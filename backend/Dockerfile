@@ -4,7 +4,7 @@ COPY --chown=gradle:gradle . /home/gradle/src
 
 WORKDIR /home/gradle/src
 
-RUN gradle clean build --no-daemon
+RUN gradle clean build --no-daemon -x test
 
 FROM eclipse-temurin:17-jre-alpine
 

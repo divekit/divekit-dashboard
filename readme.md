@@ -1,31 +1,19 @@
 # Divekit-Dashboard
 
+![Divekit Dashboard](backend/src/main/resources/dashboard.png)
+
 ## Setting up the project
 You can choose between building the project locally or running it with Docker.
 
-### Option 1: Docker Hub
-1. Create and copy personal access token from GitLab. Default is found at
-https://git.archi-lab.io/-/user_settings/personal_access_tokens.
-2. Download both images for frontend and backend from Docker Hub 
-    > docker image pull lzinn/divekit-dashboard:frontend
-
-    > docker image pull lzinn/divekit-dashboard:backend
-3. Start frontend
-    > docker run -d -p 3000:3000 lzinn/divekit-dashboard:frontend
-4. Start backend, setting the GitLab server and GitLab token as environment variables. <var>&lt;GitLab Server URL></var> and <var>&lt;GitLab Token></var> need to be replaced with actual values. 
-    > docker run -d -p 8080:8080 -e GITLAB_SERVER=<var>&lt;GitLab Server URL></var> -e GITLAB_TOKEN=<var>&lt;GitLab Token></var>  lzinn/divekit-dashboard:backend
-    
-    Example: 
-    >docker run -d -p 8080:8080 -e GITLAB_SERVER=https://git.archi-lab.io -e GITLAB_TOKEN=1234567890 lzinn/divekit-dashboard:backend
-5. Access the site at http://localhost:3000/
-### Option 2: Docker Compose 
+### Docker  
 1. Create and copy personal access token from GitLab. Default is found at
    https://git.archi-lab.io/-/user_settings/personal_access_tokens.
-2. Open `.env` in the root folder of the project
-3. Set GITLAB_SERVER and GITLAB_TOKEN to your server URL and personal access token
-4. Run `docker compose up` in the root folder of the project
+2. Open `.env` in the root folder of the project.
+3. Set GITLAB_SERVER and GITLAB_TOKEN to your server URL and personal access token.
+   - Other values such as the database login and container ports can be optionally changed as well.
+4. Run `docker compose up` in the root folder of the project.
 5. Access the site at http://localhost:3000/
-### Option 3: Build Locally
+### Build Locally
 #### Backend:
 1. Create and copy personal access token from GitLab. Default is found at
    https://git.archi-lab.io/-/user_settings/personal_access_tokens.
@@ -33,7 +21,7 @@ https://git.archi-lab.io/-/user_settings/personal_access_tokens.
     > /backend/build.gradle
 3. Sync Gradle project
 4. Edit run configuration to include environment variables `GITLAB_SERVER=` and `GITLAB_TOKEN=` with your server URL
-and personal access token 
+and personal access token
 5. Run application (`DivekitDashboardApplication.java`) or run Gradle task `bootRun`
 
 #### Frontend:
@@ -41,6 +29,92 @@ and personal access token
 2. Run `npm start`
 3. Access the site at http://localhost:3000/
 <br />
+
+## Project Overview
+Divekit-Dashboard is a web application designed to track and visualize the progress of students through various milestones. 
+The application integrates with GitLab repositories to fetch milestone overview files, allowing users to monitor student 
+performance via interactive charts.
+
+#### Adding a new milestone overview file
+The source for the milestone overview files can be set in the upper right corner. More milestone overview file sources 
+can be added after data has been successfully analyzed. 
+
+#### Displaying a specific milestone
+By clicking on the dropdown menu on the upper left, a specific milestone can be displayed with the corresponding charts. 
+
+#### Refreshing milestone status
+All milestones can be refreshed by clicking the refresh button next to the milestone dropdown menu in the upper left.
+
+#### Managing milestones
+Milestones can be managed by clicking the settings button next to the milestone dropdown menu in the upper left. A view
+ with all milestones will be displayed. Milestones can be deleted by pressing the trash icon on the right next to the 
+name of the corresponding milestone.
+
+### Charts Explanation
+#### Commit Bar Chart
+Displays a bar chart of the commit frequency distribution among students. The button on the upper right lets the user
+copy the chart to clipboard. 
+
+Clicking on part of the bar brings the user to a page of all students who fulfill 
+that category (ex.: show all students that are finished).
+
+* Divided into five categories:<br>
+not started, at least one commit, >= 60% of tests done, >= 90% of tests done, finished
+
+<img src= "backend/src/main/resources/chart1.png" style="border: 2px solid #DEDEDE; border-radius: 5px;">
+
+#### Commit Pie Chart
+Displays a pie chart of commit frequency distribution among students.
+
+Clicking on a part of the pie chart brings the user to a page of all students who fulfill
+that category (ex.: show all students that have over 60 commits).
+
+* Divided into multiple categories:<br>
+  0, 1-5, 6-10, 11-20, 21-40, 41-60, 60+ commits
+
+<img src= "backend/src/main/resources/chart2.png" style="border: 2px solid #DEDEDE; border-radius: 5px;">
+
+#### Commit Bar Chart
+Displays the same information as the commit pie chart in a different chart format.
+
+Clicking on a part of the bar chart brings the user to a page of all students who fulfill
+that category (ex.: show all students that have over 60 commits).
+
+* Divided into multiple categories:<br>
+  0, 1-5, 6-10, 11-20, 21-40, 41-60, 60+ commits
+
+<img src= "backend/src/main/resources/chart3.png" style="border: 2px solid #DEDEDE; border-radius: 5px;">
+
+#### Student Progress Line Chart
+Displays the distribution of student progress. Each point represents the number of students at a specific progress 
+percentage.
+
+<img src= "backend/src/main/resources/chart4.png" style="border: 2px solid #DEDEDE; border-radius: 5px;">
+
+#### Test Bar Charts
+Displays an overview of the test completion status for each group of milestone tests.
+
+Clicking on a part of a test bar chart brings the user to a page of all students who fulfill
+that category (ex.: show all students that have not passed e08ManualCheck).
+
+<img src= "backend/src/main/resources/chart5.png" style="border: 2px solid #DEDEDE; border-radius: 5px;">
+
+#### Student Table
+Displays a table of students with their respective commit counts, first commit date, passed tests, and milestone progress.
+Students who have not passed all tests yet are highlighted. 
+
+Clicking on a row in the table opens a sub-view with more information about the respective student 
+(see student detail page).
+
+<img src= "backend/src/main/resources/chart6.png" style="border: 2px solid #DEDEDE; border-radius: 5px;">
+
+#### Student Detail Page
+Displays a detailed view of a respective student. Includes links to repositories and test page, status of tests, 
+commit count, commit calendar and timeline.
+
+<img src= "backend/src/main/resources/chart7.png" style="border: 2px solid #DEDEDE; border-radius: 5px;">
+
+
 
 ## Backend Overview
 
@@ -100,20 +174,24 @@ Methods:
 
 ### Directory Structure
 
-- dashboard: Modules required for the dashboard, the main application.
-- chart_modules: Charts for the dashboard based on Nivo charts.
+- dashboard: Modules required for the main application.
+  - charts: Charts for the dashboard based on Nivo charts.
+  - dashboard-view: Modules for the main dashboard page.
+  - settings-view: Modules for the settings page to delete milestones.
+  - students-view: Modules for the student detail page when clicking on a specific student.
 - rest: REST calls to the backend.
+- theme: Sets main colors for the application.
 
 ### Main Files
 
 - `Dashboard.tsx`: Main file for the dashboard. `<ChartsOverview()>` displays all visible charts.
 - `<NavBar>`: Navigation bar for dashboard. Default milestone overview link (in the upper right corner) can be changed 
 here or set to empty.
-- `chartData.ts`: Functions that return data required for the charts. They get called in the corresponding Nivo charts. 
+- `chartData.ts`: Functions that return data required for the charts. Get called in the corresponding Nivo charts. 
 For new charts, data functions can be added here. See the Nivo documentation to understand what data is expected for
 each chart.
 
-### Adding a New Chart:
+#### Adding a New Chart:
 
 0. (Optional) Create data function in `chartData.ts`
 1. Create a chart module in `chart_modules`
@@ -128,7 +206,7 @@ each chart.
 ### Backend
 
 - Java 17 with Spring Boot and Gradle
-- H2 memory database
+- Postgres database
 - GitLab4J API for working with the GitLab REST API
 
 ![UML diagram](backend/src/main/resources/uml diagram.png)

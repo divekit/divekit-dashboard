@@ -1,9 +1,6 @@
 package thkoeln.DivekitDashboard.student;
 
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -23,8 +20,9 @@ public class Student {
 
     @ElementCollection
     private List<MilestoneTest> milestoneTests;
+
     @ElementCollection
-    private List<String> commits; // commits stored as commit hash
+    private List<Commit> commits;
 
     public Student(String name,
                    String codeRepoUrl,

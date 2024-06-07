@@ -1,9 +1,11 @@
 import { ReactNode } from "react";
 import { IMilestoneTest, IStudent } from "../../../rest/types";
-import { useDashboardContext } from "../../DashboardContext";
+import { useMilestoneContext } from "../../DashboardContext";
+import { StudentCalendar } from "./StudentCalendar";
+import { CommitCalendar } from "../../students-view/StudentDetail";
 
-export default function StudentDetail({id} : {id: number}) {
-  const student = useDashboardContext().students.find(student => student.id === id);
+export default function StudentInfo({id} : {id: number}) {
+  const student = useMilestoneContext().get?.students.find(student => student.id === id);
   if(!student){
     return <>Cannot find student with id: {id}</>
   }
@@ -26,15 +28,17 @@ export default function StudentDetail({id} : {id: number}) {
     <a href={student.testRepoUrl} target="_blank" rel="noopener noreferrer">Test Repository</a>&nbsp;
     <a href={student.testOverviewUrl} target="_blank" rel="noopener noreferrer">Test Result Page</a>
     <p>Commit Count: {student.commits.length}</p>
-
+    {student.commits.length > 0 && <CommitCalendar student={student}/>}
     {testOverview}
   </div>
 }
 
+
+
 function getGroupTestOverview(student: IStudent, tests: IMilestoneTest[]): ReactNode[]{
   const testRows: ReactNode[] = []
   tests.forEach((test, index) => testRows.push(
-    <nav key={index}><a className="test" href={student.testOverviewUrl + "/#report-" + (test.id)} target="_blank" rel="noopener noreferrer">
+    <nav key={index}><a className="test" href={student.testOverviewUrl + "/#report-" + (test.id)} target="_blank" rel="noopener noreferrer" style={{color: '#5b7abd'}}>
       <div className="test-icon" style={{backgroundColor: test.passed ? "#2ec27e" : "#e01b24"}}/>
       {test.name}
     </a></nav>))

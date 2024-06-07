@@ -1,3 +1,8 @@
+:root {
+  --button-color: #BB2585;
+  --button-color-hovered: #971367;
+}
+
 .chart {
   background-color: #fff;
   border-radius: 10px;
@@ -40,7 +45,7 @@
 }
 
 .student-table {
-  max-height: 400px;
+  max-height: 440px;
   overflow-y: scroll;
   border-radius: 6px;
 }
@@ -111,7 +116,7 @@
 button {
   display: inline-block;
   border-radius: 4px;
-  background-color: #5DC6F4;
+  background-color: var(--button-color);
   border: none;
   color: #FFFFFF;
   text-align: center;
@@ -137,8 +142,9 @@ button:disabled {
 
 button:hover:not(:disabled) {
   /* transform: scale(1.03);  */
-  background-color: #4AACF8;
+  background-color: var(--button-color-hovered);
 }
+
 
 /**/
 
@@ -157,14 +163,12 @@ button:hover:not(:disabled) {
 
 .milestone-source {
   margin-left: auto;
-  margin-right: 10px;
 }
 
 .nav-bar {
   position: sticky;
   top: 0;
   left: 0;
-  width: 100%;
   z-index: 10;
   background-color: #fff;
   border-radius: 5px;
@@ -180,4 +184,194 @@ button:hover:not(:disabled) {
   text-decoration: underline;
   text-decoration-color: #5DC6F4;
   text-decoration-thickness: 4px;
+}
+
+.milestone-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 40vh;
+}
+
+/* pop up */
+.overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  transition: opacity 500ms;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.overlay:target {
+  visibility: visible;
+  opacity: 1;
+}
+
+.popup {
+  margin: 70px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 5px;
+  width: 30%;
+  position: relative;
+  transition: all 5s ease-in-out;
+}
+
+.popup h2 {
+  margin-top: 0;
+  color: #333;
+  font-family: Tahoma, Arial, sans-serif;
+}
+.popup .close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  transition: all 200ms;
+  font-size: 30px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #333;
+}
+.popup .close:hover {
+  color: rgb(69, 6, 216);
+}
+.popup .content {
+  max-height: 30%;
+  overflow: auto;
+}
+
+/* user overview */
+.user-overview {
+  width: 100%;
+}
+
+.user-overview th {
+  text-align: left;
+}
+
+.user-overview th, td {
+  padding-right: 2em;
+}
+
+.user-overview .edit-box {
+  text-align: right;
+}
+
+.user-overview .edit {
+  /* background-color: transparent; */
+}
+
+.create-user input {
+  text-align: left;
+  border-radius: 4px;
+  border: 1px solid #C3CCCD;
+  padding: 5px;
+  margin-right: 15px;
+  width: 220px;
+  font-size: 16px;
+}
+
+.input-title {
+  font-size: 14px;
+  /* margin: none; */
+  margin-bottom: -1px;
+  font-weight: bold;
+}
+
+.create-user {
+  display: flex;
+}
+
+.create-user button {
+  align-self: flex-end;
+}
+
+/* student detail page*/
+.student-detail {
+  display: flex;
+  flex-direction: row;
+}
+
+.student-detail button {
+  width: 180px;
+  padding: 8px;
+}
+
+.student-detail a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.student-detail a:after {
+  content: " ⤴";
+  /* content: " ❐"; */
+}
+
+/* timeline */
+
+
+.timeline {
+  padding: 0em 34rem 0em 0em;
+  /* height: 100%; */
+}
+
+.timeline-container {
+  font-family: "PT Sans", sans-serif;
+  width: 50%;
+  margin: auto;
+  display: block;
+  position: relative;
+}
+
+.timeline-container ul.timeline-list {
+  margin: 2.5em 0;
+  padding: 0;
+  display: inline-block;
+}
+
+.timeline-container ul.timeline-list li {
+  list-style: none;
+  margin: auto;
+  margin-left: 10em;
+  min-height: 50px;
+  border-left: 2px solid #55EBFF;
+  padding: 0 0 50px 30px;
+  position: relative;
+}
+
+.timeline-container ul.timeline-list li:last-child {
+  border-left: 0;
+}
+
+.timeline-container ul.timeline-list li::before {
+  position: absolute;
+  left: -10px;
+  content: " ";
+  border: 2px solid #55EBFF;
+  border-radius: 500%;
+  background: #55EBFF;
+  height: 13px;
+  width: 13px;
+  transition: all 500ms ease-in-out;
+}
+
+ul.timeline-list li .timestamp {
+  position: relative;
+  width: 200px;
+  font-size: 12px;
+  text-align: left;
+  padding-left: 15px;
+  font-weight: bold;
+}
+
+.item-content {
+  text-wrap: wrap;
+  text-align: left;
+  padding-left: 15px;
+  padding-top: 4px;
 }

@@ -30,11 +30,11 @@ public class MilestoneService {
         return milestoneRepository.findById(id).orElseThrow(NoSuchElementException::new);
     }
 
-    public Iterable<Milestone> getAllMilestones(){
+    public List<Milestone> getAllMilestones(){
         return milestoneRepository.findAll();
     }
 
-    public Iterable<String> getAllMilestoneSources(){
+    public List<String> getAllMilestoneSources(){
         return milestoneRepository.getAllSources();
     }
 
@@ -47,4 +47,7 @@ public class MilestoneService {
     }
 
 
+    public void removeMilestone(String id) {
+        milestoneRepository.deleteById(id);
+    }
 }

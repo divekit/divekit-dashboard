@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.StreamSupport;
 
-@CrossOrigin(origins = "http://localhost:3000/")
+@CrossOrigin(origins = "http://localhost:3000/", allowCredentials = "true")
 @RestController
 @RequestMapping("/milestones")
 public class GitlabController {
@@ -50,6 +50,12 @@ public class GitlabController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteMilestone(@PathVariable String id){
+        milestoneService.removeMilestone(id);
+        return new ResponseEntity<>(id, HttpStatus.OK);
+    }
+
     @RequestMapping(value = "/sources/**", method = RequestMethod.POST)
     public ResponseEntity<String> addMilestoneSource(@RequestBody String milestoneLink) {
         try {
@@ -57,6 +63,7 @@ public class GitlabController {
             List<Student> students = studentService.saveStudentsFromOverview(file);
             milestoneService.saveMilestoneFromOverview(file.getFileName(), milestoneLink, students);
         } catch (GitLabApiException | RuntimeException e) {
+            System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
@@ -96,9 +103,7 @@ public class GitlabController {
     @Scheduled(cron = "0 0 * * * *")
     public void updateMilestones() {
         System.out.println("Updating milestones...");
-        List<Milestone> milestones = StreamSupport
-                .stream(milestoneService.getAllMilestones().spliterator(), false)
-                .toList();
+        List<Milestone> milestones = milestoneService.getAllMilestones().stream().toList();
 
         if(milestones.isEmpty()){
             return;

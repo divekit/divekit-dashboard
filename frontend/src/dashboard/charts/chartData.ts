@@ -1,8 +1,13 @@
-import { IStudent } from "../rest/types";
+import { ICommit, IStudent } from "../../rest/types";
 
 type commitDataPoint = {
   id: string;
   value: number;
+};
+
+type calendarDataPoint = {
+  value: number;
+  day: string;
 };
 
 type dataPoint = {
@@ -94,15 +99,22 @@ export function getStudentProgress(students: IStudent[]){
 }
 
 export function getProgressDistribution(students: IStudent[]) {
-  const progressDistribution = { notStarted: 0, started: 0, finished: 0 }
+  const progressDistribution = { notStarted: 0, started: 0, sixtyPercent: 0, ninetyPercent: 0, finished: 0 }
 
   students.forEach((student) => {
     if (student.commits.length === 0) {
       progressDistribution.notStarted++
-    } else if (calculateStudentProgress(student) === 100) {
-      progressDistribution.finished++
     } else {
-      progressDistribution.started++
+      const progress = calculateStudentProgress(student)
+      if (progress === 100) {
+        progressDistribution.finished++
+      } else if(progress >= 90){
+        progressDistribution.ninetyPercent++
+      } else if(progress >= 60){
+        progressDistribution.sixtyPercent++
+      } else {
+        progressDistribution.started++
+      }
     }
   })
 
@@ -147,6 +159,57 @@ export function getStudentsByCommitCount(students: IStudent[], commitRange: Stri
   const lowerLimit = +range[0]
   const upperLimit = +range[1]
   return students.filter(student => student.commits.length >= lowerLimit && student.commits.length <= upperLimit)
+}
+
+export function getStudentsByTestProgress(students: IStudent[], progress: String){
+  return students.filter(student => {
+    if(progress === "notStarted"){
+      return student.commits.length === 0
+    } else if(progress === "finished"){
+      return calculateStudentProgress(student) === 100
+    } else {
+      return student.commits.length > 0 && calculateStudentProgress(student) < 100
+    }
+  })
+}
+
+export function getStudentsByTestFinished(students: IStudent[], testNumber: number, finished: boolean) {
+  return students.filter(student => {
+    const test = student.milestoneTests.find((test) => test.id === testNumber)
+    return test && test.passed === finished
+  })
+}
+
+export function getCommitsByDate(student: IStudent){
+  return student.commits.reduce(
+    (acc: calendarDataPoint[], commit: ICommit) => {
+      // gets the date without the time part. example: 2023-10-20T01:26:09.000+00:00 -> 2023-10-20
+      let date = commit.date.toLocaleString().split('T')[0] 
+      
+      const existingEntry = acc.find(entry => entry.day === date);
+      if (existingEntry) {
+        existingEntry.value++;
+      } else {
+        acc.push({ day: date, value: 1 });
+      }
+      return acc.sort((a, b) => {
+        return new Date(a.day).getTime() - new Date(b.day).getTime();
+      });
+    },
+    []
+  );
+}
+
+export function formatCommitData(commits: ICommit[]){
+  const commitData : {x: string, y: number}[] = [] 
+  commits.forEach(commit => {
+    const date = new Date(commit.date)
+    commitData.push({x: date + "", y: 1})
+  })
+
+  console.log([{ id: "progress", color:  "hsl(198, 87%, 66%)", data: commitData }])
+
+  return [{ id: "progress", color:  "hsl(198, 87%, 66%)", data: commitData }];
 }
 
 function randomInt(min: number, max: number) {

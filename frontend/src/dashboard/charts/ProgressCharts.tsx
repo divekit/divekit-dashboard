@@ -1,13 +1,16 @@
-import { getProgressDistribution, getStudentProgress } from "../chartData";
-import { useDashboardContext } from "../DashboardContext";
+import { getProgressDistribution, getStudentProgress, getStudentsByTestProgress } from "./chartData";
+import { useMilestoneContext, useStudentFilterContext } from "../DashboardContext";
 import { ResponsiveBar } from "@nivo/bar";
 import { ResponsiveLine } from "@nivo/line";
-
-const colorScheme = ["#5fecff", "#5fe2fc", "#5ed9fa", "#5ecff7", "#5dc6f4", "#5bbcf1", "#59b3ef", "#57aaec", "#55a0e9", "#5297e6", "#4f8ee3", "#4b85e0", "#477cdd", "#4373da", "#3e6ad7", "#3861d4", "#3158d1", "#294fce", "#1f46cb", "#0f3dc8"]
-/*TODO: define color scheme only once somewhere else*/
+import { ColorScheme } from "../../theme/schemes";
+import { Color } from "../../theme/colors";
 
 export function ProgressLineChart(){
-  const students = useDashboardContext().students
+  const students = useMilestoneContext().get?.students
+  if(!students) {
+    return <></>
+  }
+
   return <ResponsiveLine
     data={getStudentProgress(students)}
     margin={{ top: 50, right: 10, bottom: 50, left: 60 }}
@@ -21,7 +24,7 @@ export function ProgressLineChart(){
         stacked: true,
         reverse: false
     }}
-    colors={ colorScheme }
+    colors={ ColorScheme.progressLine }
     curve="monotoneX"
     enableArea
     axisTop={null}
@@ -50,25 +53,39 @@ export function ProgressLineChart(){
 }
 
 export function ProgressBarChart() {
-  const students = useDashboardContext().students
+  const students = useMilestoneContext().get?.students
+  const setFilteredStudents = useStudentFilterContext().setFilteredStudents
+  if(!students) {
+    return <></>
+  }
   const progressDistribution = getProgressDistribution(students)
+  const colorScheme = ColorScheme.progressBar
+
   return <div style={{height: 130, width: 400}}>
-      <center><h4 style={{color: "#5297e6"}}>
+      <center><h4 style={{color: Color.notStarted}}>
         {progressDistribution[0].notStarted + "% of students did not start yet"}
       </h4></center>
         <ResponsiveBar
           data={getProgressDistribution(students)}
+          onClick={(node) => {
+            setFilteredStudents(getStudentsByTestProgress(students, node.id + ""))
+          }}
           keys={[
             'notStarted',
             'started',
+            'sixtyPercent',
+            'ninetyPercent',
             'finished'
           ]}
           label={(data) => data.value + "%"}
-          valueFormat={(value) => value + "%"}
-          // tooltip={ point => <div style={{fontSize: '12px'}}>{point.value}</div>}
+          valueFormat={(value) => value + "%"}          
           tooltipLabel={(data) => {
             if(data.id === "notStarted"){
               return "not started"
+            } if(data.id === "sixtyPercent"){
+              return "60%"
+            } if(data.id === "ninetyPercent"){
+              return "90%"
             } else {
               return data.id + ""
             }
@@ -78,7 +95,7 @@ export function ProgressBarChart() {
           layout="horizontal"
           valueScale={{ type: 'linear' }}
           indexScale={{ type: 'band', round: true }}
-          colors={ ["#5297e6", "#5dc6f4", "#5fecff"] }    
+          colors={ colorScheme }    
           borderColor={{
               from: 'color',
               modifiers: [
@@ -104,6 +121,10 @@ export function ProgressBarChart() {
           legendLabel={(data) => {
             if(data.id === "notStarted"){
               return "not started"
+            } if(data.id === "sixtyPercent"){
+              return "60% +"
+            } if(data.id === "ninetyPercent"){
+              return "90% +"
             } else {
               return data.id + ""
             }
@@ -116,8 +137,7 @@ export function ProgressBarChart() {
                 justify: false,
                 translateX: 0,
                 translateY: 0,
-                itemsSpacing: 2,
-                itemWidth: 100,
+                itemWidth: 70,
                 itemHeight: 0,
                 itemDirection: 'top-to-bottom',
                 itemOpacity: 0.85,

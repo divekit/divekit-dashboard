@@ -1,16 +1,22 @@
 import { ResponsivePie } from "@nivo/pie"
-import { getCommitFrequency, getStudentsByCommitCount } from "../chartData"
-import { useDashboardContext } from "../DashboardContext";
+import { getCommitFrequency, getStudentsByCommitCount } from "./chartData"
+import { useMilestoneContext, useStudentFilterContext } from "../DashboardContext";
 import { ResponsiveBar } from "@nivo/bar";
-
-const colorScheme = ["#5fecff", "#58d6fd", "#51c1fb", "#4aacf8", "#4398f6", "#3c83f4", "#356ef2"]
+import { ColorScheme } from "../../theme/schemes";
 
 export function CommitPieChart(){
-  const students = useDashboardContext().students
+  const setFilteredStudents = useStudentFilterContext().setFilteredStudents
+  const students = useMilestoneContext().get?.students
+  if(!students) {
+    return <></>
+  }
+  const commitFrequency = getCommitFrequency(students, true)
+  const colorScheme = ColorScheme.commit(commitFrequency.length)
+
   return <ResponsivePie
-      data={getCommitFrequency(students, true)}
+      data={commitFrequency}
       onClick={(node) => {
-        console.log(getStudentsByCommitCount(students, node.id + ""))
+        setFilteredStudents(getStudentsByCommitCount(students, node.id + ""))
       }}
       valueFormat={(value) => (value * 100).toFixed(1) + "%"}
       arcLabel={(data) => (data.id + "")}
@@ -31,12 +37,19 @@ export function CommitPieChart(){
 }
 
 export function CommitBarChart(){
-  const students = useDashboardContext().students
+  const setFilteredStudents = useStudentFilterContext().setFilteredStudents
+  const students = useMilestoneContext().get?.students
+  if(!students) {
+    return <></>
+  }
+  const commitFrequency = getCommitFrequency(students)
+  const colorScheme = ColorScheme.commit(commitFrequency.length)
+
   return <ResponsiveBar
-    data={getCommitFrequency(students)}
+    data={commitFrequency}
     onClick={(node) => {
-        console.log(getStudentsByCommitCount(students, node.indexValue + ""))
-      }}
+      setFilteredStudents(getStudentsByCommitCount(students, node.indexValue + ""))
+    }}
     indexBy="id"
     tooltipLabel={() => "students"}
     margin={{ top: 50, right: 10, bottom: 50, left: 60 }}

@@ -1,30 +1,45 @@
+const BACKEND_SERVER = "http://localhost"
+const BACKEND_PORT = "8080"
+const BACKEND_URL = BACKEND_SERVER + ":" + BACKEND_PORT
+
 export async function fetchMilestones(){
-  const response = await fetch('http://localhost:8080/milestones')
-  return await response.json()
+  const response = await fetch(`${BACKEND_URL}/milestones`,  {
+      method: 'GET',
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include'
+    })
+  return response
+}
+
+export async function deleteMilestone(name: string){
+  const response = await fetch(`${BACKEND_URL}/milestones/${name}`, {
+    method: 'DELETE',
+    credentials: 'include'
+  })
+  return response
 }
 
 export async function getMilestoneSourcePaths(milestoneSourceURL: string) {
   let response;
   try {
-    response = await fetch(`http://localhost:8080/milestones/sources/paths?link=${milestoneSourceURL}`, {
-      method: 'GET'
+    response = await fetch(`${BACKEND_URL}/milestones/sources/paths?link=${milestoneSourceURL}`,  {
+      method: 'GET',
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include'
     })
   } catch (error) {
     console.log(error)
   }
-  if (response?.ok) {
-    return response.json()
-  } else {
-    return []
-  }
+  return response
 }
 
 export async function postMilestoneSource(milestoneSourceURL: string) {
   let response;
   try {
-    response = await fetch(`http://localhost:8080/milestones/sources/${milestoneSourceURL}`, {
+    response = await fetch(`${BACKEND_URL}/milestones/sources/${milestoneSourceURL}`, {
       method: 'POST',
-      body: milestoneSourceURL
+      body: milestoneSourceURL,
+      credentials: 'include'
     })
   } catch (error) {
     console.log(error)
@@ -33,8 +48,9 @@ export async function postMilestoneSource(milestoneSourceURL: string) {
 }
 
 export async function fetchMilestoneSources(){
-  const response = await fetch(`http://localhost:8080/milestones/sources`, {
-    method: 'GET'
+  const response = await fetch(`${BACKEND_URL}/milestones/sources`, {
+    method: 'GET',
+    credentials: 'include'
   })
   return response.json()
 }
@@ -42,17 +58,14 @@ export async function fetchMilestoneSources(){
 export async function requestRefresh(){
   let response;
   try {
-    response = await fetch(`http://localhost:8080/milestones/refresh`, {
-    method: 'GET'
+    response = await fetch(`${BACKEND_URL}/milestones/refresh`, {
+    method: 'GET',
+    credentials: 'include'
   }) 
   } catch (error) {
     console.log(error)
   }
-  if (response?.ok) {
-    return response.json()
-  } else {
-    return []
-  }
+  return response
 }
 
 export function wait(delay: number){

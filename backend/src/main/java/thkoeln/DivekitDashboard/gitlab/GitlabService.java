@@ -1,11 +1,12 @@
 package thkoeln.DivekitDashboard.gitlab;
 
 import jakarta.annotation.PostConstruct;
+import lombok.val;
 import org.gitlab4j.api.GitLabApi;
 import org.gitlab4j.api.GitLabApiException;
-import org.gitlab4j.api.models.Commit;
 import org.gitlab4j.api.models.RepositoryFile;
 import org.springframework.stereotype.Service;
+import thkoeln.DivekitDashboard.student.Commit;
 import thkoeln.DivekitDashboard.student.MilestoneTest;
 import thkoeln.DivekitDashboard.student.Student;
 
@@ -50,18 +51,18 @@ public class GitlabService {
                 .orElseThrow(() -> new GitLabApiException("Could not get milestone file from source " + source + "."));
     }
 
-    private List<String> fetchStudentCommits(Student student){
+    private List<Commit> fetchStudentCommits(Student student){
         try {
-            String trimmedCodeRepoURL = student.getCodeRepoUrl().replace(GITLAB_SERVER + "/", "");
-            List<Commit> commits = gitLab.getCommitsApi().getCommits(trimmedCodeRepoURL);
+            val trimmedCodeRepoURL = student.getCodeRepoUrl().replace(GITLAB_SERVER + "/", "");
+            val gitlabCommits = gitLab.getCommitsApi().getCommits(trimmedCodeRepoURL);
 
             // removes automatic initial commit as it's not made by students
-            commits.remove(0);
+            gitlabCommits.remove(0);
 
-            List<String> commitHashes = new ArrayList<>();
-            commits.forEach(commit -> commitHashes.add(commit.getId()));
-
-            return commitHashes;
+            val createdCommits = new ArrayList<Commit>();
+            gitlabCommits.forEach(commit -> createdCommits.add(
+                    new Commit(commit.getId(), commit.getAuthoredDate(), commit.getMessage())));
+            return createdCommits;
         } catch (GitLabApiException e) {
             throw new RuntimeException(e);
         }
