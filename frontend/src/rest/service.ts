@@ -1,12 +1,11 @@
 const BACKEND_SERVER = "http://localhost"
-const BACKEND_PORT = "8080"
+const BACKEND_PORT = process.env.REACT_APP_BACKEND_PORT
 const BACKEND_URL = BACKEND_SERVER + ":" + BACKEND_PORT
 
 export async function fetchMilestones(){
   const response = await fetch(`${BACKEND_URL}/milestones`,  {
       method: 'GET',
-      headers: {'Content-Type': 'application/json'},
-      credentials: 'include'
+      headers: {'Content-Type': 'application/json'}
     })
   return response
 }
@@ -14,7 +13,6 @@ export async function fetchMilestones(){
 export async function deleteMilestone(name: string){
   const response = await fetch(`${BACKEND_URL}/milestones/${name}`, {
     method: 'DELETE',
-    credentials: 'include'
   })
   return response
 }
@@ -24,8 +22,7 @@ export async function getMilestoneSourcePaths(milestoneSourceURL: string) {
   try {
     response = await fetch(`${BACKEND_URL}/milestones/sources/paths?link=${milestoneSourceURL}`,  {
       method: 'GET',
-      headers: {'Content-Type': 'application/json'},
-      credentials: 'include'
+      headers: {'Content-Type': 'application/json'}
     })
   } catch (error) {
     console.log(error)
@@ -38,8 +35,7 @@ export async function postMilestoneSource(milestoneSourceURL: string) {
   try {
     response = await fetch(`${BACKEND_URL}/milestones/sources/${milestoneSourceURL}`, {
       method: 'POST',
-      body: milestoneSourceURL,
-      credentials: 'include'
+      body: milestoneSourceURL
     })
   } catch (error) {
     console.log(error)
@@ -49,8 +45,7 @@ export async function postMilestoneSource(milestoneSourceURL: string) {
 
 export async function fetchMilestoneSources(){
   const response = await fetch(`${BACKEND_URL}/milestones/sources`, {
-    method: 'GET',
-    credentials: 'include'
+    method: 'GET'
   })
   return response.json()
 }
@@ -59,8 +54,7 @@ export async function requestRefresh(){
   let response;
   try {
     response = await fetch(`${BACKEND_URL}/milestones/refresh`, {
-    method: 'GET',
-    credentials: 'include'
+    method: 'GET'
   }) 
   } catch (error) {
     console.log(error)

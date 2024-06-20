@@ -1,45 +1,21 @@
 services:
   frontend:
+    image: lzinn/divekit-dashboard:frontend
     build:
       context: ./frontend/
       dockerfile: Dockerfile
-    image: lzinn/divekit-dashboard:frontend
     ports:
       - "${DOCKER_FRONTEND_PORT}:3000"
-    dns:
-      - 8.8.8.8
+    environment:
+      - REACT_APP_BACKEND_PORT=$DOCKER_BACKEND_PORT
   backend:
+    image: lzinn/divekit-dashboard:backend
     build:
       context: ./backend/
       dockerfile: Dockerfile
-    image: lzinn/divekit-dashboard:backend
-    depends_on:
-      - divekit-db
     ports:
       - '${DOCKER_BACKEND_PORT}:8080'
-    dns:
-      - 8.8.8.8
     environment:
       - GITLAB_SERVER=$GITLAB_SERVER  # default server is https://git.archi-lab.io
       - GITLAB_TOKEN=$GITLAB_TOKEN
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://divekit-db:5432/$POSTGRES_DB_NAME
-      - SPRING_DATASOURCE_USERNAME=$POSTGRES_USER
-      - SPRING_DATASOURCE_PASSWORD=$POSTGRES_PASSWORD
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-  divekit-db:
-    image: postgres
-    restart: always
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB_NAME" ]
-      interval: 1s
-    environment:
-      - POSTGRES_USER=$POSTGRES_USER
-      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-      - POSTGRES_DB=$POSTGRES_DB_NAME
-    ports:
-      - '5432:5432'
-    volumes:
-      - dbdata:/var/lib/postgresql/data
-
-volumes:
-  dbdata:
+      - DOCKER_FRONTEND_PORT=${DOCKER_FRONTEND_PORT}

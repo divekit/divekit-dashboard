@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.StreamSupport;
 
-@CrossOrigin(origins = "http://localhost:3000/", allowCredentials = "true")
 @RestController
 @RequestMapping("/milestones")
 public class GitlabController {
