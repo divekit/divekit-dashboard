@@ -16,7 +16,7 @@ public class CorsConfiguration {
                 final String FRONTEND_PORT = System.getenv("DOCKER_FRONTEND_PORT") + "";
                 registry.addMapping("/**")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
-                        .allowedOrigins(FRONTEND_URL + ":" + FRONTEND_PORT)
+                        .allowedOrigins("*")
                         .allowedHeaders("*")
                         .maxAge(-1)
                         .allowCredentials(false);
