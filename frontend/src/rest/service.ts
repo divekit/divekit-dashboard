@@ -1,4 +1,4 @@
-const BACKEND_SERVER = "http://localhost"
+const BACKEND_SERVER = process.env.REACT_APP_BACKEND_URL ? process.env.REACT_APP_BACKEND_URL : "http://localhost/"
 const BACKEND_PORT = process.env.REACT_APP_BACKEND_PORT
 const BACKEND_URL = BACKEND_SERVER + ":" + BACKEND_PORT
 

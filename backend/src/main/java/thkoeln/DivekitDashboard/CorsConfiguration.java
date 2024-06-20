@@ -12,10 +12,11 @@ public class CorsConfiguration {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
+                final String FRONTEND_URL = System.getenv("DOCKER_FRONTEND_URL") + "";
                 final String FRONTEND_PORT = System.getenv("DOCKER_FRONTEND_PORT") + "";
                 registry.addMapping("/**")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
-                        .allowedOrigins("http://localhost:" + FRONTEND_PORT)
+                        .allowedOrigins(FRONTEND_URL + ":" + FRONTEND_PORT)
                         .allowedHeaders("*")
                         .maxAge(-1)
                         .allowCredentials(false);

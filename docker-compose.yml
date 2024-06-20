@@ -1,21 +1,24 @@
 services:
   frontend:
-    image: lzinn/divekit-dashboard:frontend
     build:
       context: ./frontend/
       dockerfile: Dockerfile
+    image: lzinn/divekit-dashboard:frontend
     ports:
-      - "${DOCKER_FRONTEND_PORT}:3000"
+      - "${DOCKER_FRONTEND_PORT}:3000"               # default is 3000
     environment:
-      - REACT_APP_BACKEND_PORT=$DOCKER_BACKEND_PORT
+      - REACT_APP_BACKEND_URL='http://localhost'     # default server is https://localhost
+      - REACT_APP_BACKEND_PORT=$DOCKER_BACKEND_PORT  # default is 8080
   backend:
-    image: lzinn/divekit-dashboard:backend
     build:
       context: ./backend/
       dockerfile: Dockerfile
+    image: lzinn/divekit-dashboard:backend
+    restart: always
     ports:
-      - '${DOCKER_BACKEND_PORT}:8080'
+      - '${DOCKER_BACKEND_PORT}:8080' # default is 8080
     environment:
       - GITLAB_SERVER=$GITLAB_SERVER  # default server is https://git.archi-lab.io
-      - GITLAB_TOKEN=$GITLAB_TOKEN
-      - DOCKER_FRONTEND_PORT=${DOCKER_FRONTEND_PORT}
+      - GITLAB_TOKEN=$GITLAB_TOKEN    # ! needs to be set in .env !
+      - DOCKER_FRONTEND_URL=$DOCKER_FRONTEND_URL   # default server is https://localhost
+      - DOCKER_FRONTEND_PORT=$DOCKER_FRONTEND_PORT # default is 3000
