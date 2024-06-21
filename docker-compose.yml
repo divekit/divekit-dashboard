@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-#    image: lzinn/divekit-dashboard:latest
+    image: lzinn/divekit-dashboard:latest
     restart: always
     ports:
       - '${DOCKER_BACKEND_PORT}:8080'               # default is 8080
