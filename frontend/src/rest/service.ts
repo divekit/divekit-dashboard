@@ -1,8 +1,11 @@
-const BACKEND_SERVER = process.env.REACT_APP_BACKEND_URL ? process.env.REACT_APP_BACKEND_URL : "http://localhost"
+const BACKEND_SERVER = process.env.REACT_APP_BACKEND_SERVER ? process.env.REACT_APP_BACKEND_SERVER : "http://localhost"
 const BACKEND_PORT = process.env.REACT_APP_BACKEND_PORT ? process.env.REACT_APP_BACKEND_PORT : "8080"
 const BACKEND_URL = BACKEND_SERVER + ":" + BACKEND_PORT
 
 export async function fetchMilestones(){
+  console.log(BACKEND_SERVER)
+  console.log(BACKEND_PORT)
+  console.log(BACKEND_URL)
   const response = await fetch(`${BACKEND_URL}/milestones`,  {
       method: 'GET',
       headers: {'Content-Type': 'application/json'}
