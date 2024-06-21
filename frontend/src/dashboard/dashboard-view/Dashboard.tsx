@@ -7,17 +7,13 @@ import { ClipLoader } from "react-spinners";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import StudentsOverview from "../students-view/StudentsOverview";
-import  { useNavigate } from 'react-router-dom'
 import { NavBar } from "../NavBar";
-import Popup from '../Popup';
 import NoSourceSetNotice from "./NoSourceSet";
 import { ChartsOverview } from "./ChartsOverview";
-import { getGradient } from "../../theme/schemes";
 
 export default function Dashboard() {
   const [loadingData, setLoadingData] = useState(false)
   const [loggedIn, setLoggedIn] = useState(true)
-  const navigate = useNavigate()
 
   const dashboardContext = useInitialDashboardContext()
 
@@ -55,12 +51,6 @@ export default function Dashboard() {
       fetchMilestonesAndUpdateCharts()
     }
   }, [])
-
-  useEffect(() => {
-    if (!loggedIn) {
-      navigate("/login")
-    }
-  }, [loggedIn, navigate])
 
   return <DashboardContext.Provider value={dashboardContext}>
     <NavBar 
