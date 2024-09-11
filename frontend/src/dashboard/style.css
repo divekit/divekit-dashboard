@@ -32,8 +32,7 @@
 }
 
 .student-row td {
-  padding-top: 5px;
-  padding-bottom: 5px;
+  padding: 5px;
 }
 
 .student-row:hover td {
@@ -143,6 +142,11 @@ button:disabled {
 button:hover:not(:disabled) {
   /* transform: scale(1.03);  */
   background-color: var(--button-color-hovered);
+}
+
+.text-button {
+  width: fit-content;
+  font-size: 16px;
 }
 
 
@@ -374,4 +378,61 @@ ul.timeline-list li .timestamp {
   text-align: left;
   padding-left: 15px;
   padding-top: 4px;
+}
+
+.fraud-chart {
+  padding: 0vh 3vw;
+  height: 40vh;
+  overflow-y: scroll;
+  min-height: 50vh;
+}
+
+.collapsible {
+  margin-top: 1vh;
+}
+
+.collapsible-button {
+  padding: 1vh 1vw;
+  width: 100%;
+  text-align: left;
+}
+
+.fraud-match-button {
+  background: none;
+  color: black;
+  padding: 1vh 1vw;
+  margin: 3vh auto 0vh auto;
+  text-align: left;
+  width: 100%;
+}
+
+.fraud-match-button:hover:not(:disabled) {
+  background: none;
+  text-decoration: underline;
+}
+
+.fraud-match-id {
+  margin-left: 3vw;
+}
+
+.fraud-match-id:hover {
+  text-decoration: underline;
+}
+
+/* JPlag Config */
+.jplag-config {
+  padding: 5px 0px;
+  display: flex;
+  justify-content: space-between;
+  width: 400px;
+}
+
+.jplag-slider-label {
+  min-width: 30px;
+  display: inline-block;
+  padding-left: 10px;
+}
+
+.jplag-checkbox {
+  margin-right: 155px;
 }

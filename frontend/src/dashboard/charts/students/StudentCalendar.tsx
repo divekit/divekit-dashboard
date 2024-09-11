@@ -5,7 +5,6 @@ import { getCommitsByDate } from '../chartData'
 const colorScheme = ["#5fecff", "#58d6fd", "#51c1fb", "#4aacf8", "#4398f6", "#3c83f4", "#356ef2"]
 
 export function StudentCalendar({student} : {student: IStudent}) {
-  // TODO: getCommitsByDate function is not fully accurate yet?
   const commits = getCommitsByDate(student)
   if(commits.length === 0){
     return <></>

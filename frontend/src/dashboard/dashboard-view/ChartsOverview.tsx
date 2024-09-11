@@ -1,11 +1,12 @@
-import { useEffect, useRef } from "react"
-import { useMilestoneContext } from "../DashboardContext"
+import { useMilestoneContext, useStudentFilterContext } from "../DashboardContext"
 import { CommitPieChart, CommitBarChart } from "../charts/CommitCharts"
 import { ProgressBarChart, ProgressLineChart } from "../charts/ProgressCharts"
 import { TestBarChartOverview } from "../charts/TestCharts"
 import { StudentTableDetail } from "../charts/students/StudentTable"
 import html2canvas from "html2canvas"
 import { toast } from "react-toastify"
+import { IStudent } from "../../rest/types"
+import { FraudMessageChart } from "../charts/FraudCharts"
 
 export function ChartsOverview() {
   const students = useMilestoneContext().get?.students
@@ -31,7 +32,6 @@ export function ChartsOverview() {
         <h3 className="chart-header" style={{paddingBottom: 20}}>Student Progress</h3>
         <ProgressLineChart/>
       </div>
-      {/* <ResizableChart milestone={selectedMilestone}/>  <- keep this for later */} 
       <div className="chart">
         <h3 className="chart-header">Tests</h3>
         <TestBarChartOverview/>
@@ -42,9 +42,25 @@ export function ChartsOverview() {
         <h3 className="chart-header">Commit Distribution</h3>
         <CommitBarChart/>
       </div>
-      {students && <StudentTableDetail students={students}/>}
+      {students && 
+      <div className="chart" style={{height: 440, overflowY: "clip"}}>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <h3 className="chart-header">Student Overview</h3>
+            <ViewAllStudentsButton students={students}/>
+          </div>
+          <StudentTableDetail students={students}/>
+      </div>}
+    </div>
+    <div className="chart">
+      <h3 className="chart-header">Fraud Warnings</h3>
+      <FraudMessageChart/>
     </div>
   </div>
+}
+
+function ViewAllStudentsButton({students} : {students : IStudent[]}){
+  const setFilteredStudents = useStudentFilterContext().setFilteredStudents
+  return <button onClick={() => setFilteredStudents((students))} style={{height: "35px", width: "35px", marginLeft: 15, padding: 2, fontSize: "14pt"}}>↪</button>  
 }
 
 function ClipboardButton(){

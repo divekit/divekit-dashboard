@@ -3,9 +3,9 @@ package thkoeln.DivekitDashboard.gitlab;
 import thkoeln.DivekitDashboard.student.MilestoneTest;
 import thkoeln.DivekitDashboard.student.Student;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GitlabParser {
     public static List<Student> mdToStudentList(String mdString){
@@ -30,11 +30,14 @@ public class GitlabParser {
                 if(column < 3){
                     column++;
                 } else if (column == 3){
-                    Student student = new Student(name.toString(),
+                    Student student = new Student(
+                            uuidFromRepoUrl(codeRepoURL.toString()),
+                            name.toString(),
                             codeRepoURL.toString(),
                             testRepoURL.toString(),
                             testOverviewURL.toString(),
-                            null);
+                            null
+                    );
                     students.add(student);
 
                     name.setLength(0);
@@ -55,6 +58,17 @@ public class GitlabParser {
         }
 
         return students;
+    }
+
+    private static UUID uuidFromRepoUrl(String repoUrl) {
+        Pattern regexPattern = Pattern.compile("[a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8}", Pattern.MULTILINE);
+        Matcher matcher = regexPattern.matcher(repoUrl);
+
+        if (matcher.find()) {
+            return UUID.fromString(matcher.group(0));
+        } else {
+            throw new IllegalArgumentException("UUID could not be found in repository URL.");
+        }
     }
 
     public static ArrayList<MilestoneTest> htmlToTests(String htmlString) {

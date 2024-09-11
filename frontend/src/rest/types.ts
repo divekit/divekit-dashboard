@@ -32,3 +32,25 @@ export interface IUser {
   password: string,
   name?: string
 };
+
+export interface IFraudMessage {
+  id: number,
+  text: string,
+  campusId: string,
+  expectedName: string,
+  actualName: string,
+  placeholder: string,
+  filePathFromSrc: string,
+  detectionDate: Date
+}
+
+export type IFraudMatches = Map<string, Map<string, number>>
+
+export interface IRepositoryData {
+  downloadedRepositories?: number,
+  sizeInByte?: number
+}
+
+export interface JPlagConfig {
+  minToken: string, threshold: string, useBaseCode: boolean;
+}

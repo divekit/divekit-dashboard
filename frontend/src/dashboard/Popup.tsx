@@ -1,12 +1,12 @@
-import { Settings } from './settings-view/Settings';
+import { ReactNode } from 'react';
 
-export default function Popup() {
-  return <div id="settings" className="overlay">
+export default function Popup({id, content} : {id: string, content: ReactNode}) {
+  return <div id={id} className="overlay">
     <div className="popup">
       <h2></h2>
       <a className="close" href="#">&times;</a>
       <div className="content">
-        <Settings />
+        {content}
       </div>
     </div>
   </div>;

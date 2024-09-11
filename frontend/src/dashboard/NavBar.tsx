@@ -5,6 +5,8 @@ import { getMilestoneSourcePaths, postMilestoneSource, requestRefresh } from "..
 import { ClipLoader, PulseLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import Popup from './Popup';
+import { Settings } from "./settings-view/Settings";
+import { JPlagSettings } from "./settings-view/JPlagSettings";
 
 export function NavBar({ setLoggedIn, fetchMilestonesAndUpdateCharts }: {
   setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
@@ -30,12 +32,18 @@ export function NavBar({ setLoggedIn, fetchMilestonesAndUpdateCharts }: {
         setLoggedIn(false);
         return;
       } else if (!response || !response.ok) {
-        toast.error("Overview path does not exist. Please try a different link.");
+        toast.error("Overview path does not exist or API key is not set. Please try a different link.");
         setDisableButton(false);
         return;
       }
 
       response.json().then((paths: string[]) => {
+        if (paths.length === 0) {
+          setDisableButton(false);
+          toast.warning("No milestone overviews found in path.")
+          return;
+        }
+
         setPathsToProcess(paths.length);
 
         paths.forEach(async (path) => postMilestoneSource(path).then((response) => {
@@ -73,7 +81,7 @@ export function NavBar({ setLoggedIn, fetchMilestonesAndUpdateCharts }: {
     }
   }, [pathsFinished, pathsToProcess]);
 
-  return <div style={{ backgroundColor: 'white', display: "flex", alignItems: "center" }} className="nav-bar">
+  return <div style={{ backgroundColor: 'white', display: "flex", alignItems: "center"}} className="nav-bar">
     {filteredContext.filteredStudents ?
       <div>
         <button onClick={() => {
@@ -84,18 +92,21 @@ export function NavBar({ setLoggedIn, fetchMilestonesAndUpdateCharts }: {
       </div> :
       <div>
         {milestones && 
-        <div>
+        <div style={{  display:"flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
           Milestone:<MilestoneDropdown setSelectedMilestone={setCurrentMilestone} selectedMilestone={getCurrentMilestone} milestones={milestones} />
           <button onClick={() => onRequestRefresh()} disabled={isRefreshingMilestones || milestones.length === 0}>
             {isRefreshingMilestones ?
               <ClipLoader size={11} color="#5fecff" /> :
               "⟳"}
           </button>
-          <Popup></Popup>
-          {/* settings button is not centered for whatever reason.. */}
-          <a href="#settings"><button>
+          <Popup id="settings" content={<Settings/>}></Popup>
+          <a href="#settings"><button style={{height: "31px", fontSize: "15pt", paddingTop: 1}}>
             ⚙
           </button></a>
+          {getCurrentMilestone && <><Popup id="jplag-settings" content={<JPlagSettings/>}></Popup>
+          <a href="#jplag-settings">
+            <button style={{height: "31px", width: "80px", padding: 2, fontSize: "12pt"}}>JPlag</button>  
+          </a></>}
         </div>}
       </div>
     }
@@ -114,7 +125,7 @@ export function NavBar({ setLoggedIn, fetchMilestonesAndUpdateCharts }: {
   </div>;
 }
 
-function MilestoneDropdown({ setSelectedMilestone, selectedMilestone, milestones }: { setSelectedMilestone: React.Dispatch<React.SetStateAction<IMilestone | undefined>>; selectedMilestone: IMilestone | undefined; milestones: IMilestone[]; }) {
+export function MilestoneDropdown({ setSelectedMilestone, selectedMilestone, milestones }: { setSelectedMilestone: React.Dispatch<React.SetStateAction<IMilestone | undefined>>; selectedMilestone: IMilestone | undefined; milestones: IMilestone[]; }) {
   const options = [];
   milestones.sort((one, two) => (one.name < two.name ? -1 : 1));
   for (let i = 0; i < milestones.length; i++) {

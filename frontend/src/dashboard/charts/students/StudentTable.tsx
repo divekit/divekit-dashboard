@@ -1,7 +1,4 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import { calculateStudentProgress } from "../chartData";
-import { useMilestoneContext } from "../../DashboardContext";
-import StudentInfo from "./StudentInfo";
 import { IStudent } from "../../../rest/types";
 import { Color } from "../../../theme/colors";
 import StudentDetail from "../../students-view/StudentDetail";
@@ -41,7 +38,7 @@ export function StudentTableDetail({students} : {students: IStudent[]}) {
     studentRows.push(studentRow);
   }
 
-  return <div className="chart student-table">
+  return <div className="student-table">
     <table style={{ textAlign: "center", borderCollapse: "collapse" }} className="table sortable">
       <tr className="table-header">
         <th className="table-header">Campus ID</th>

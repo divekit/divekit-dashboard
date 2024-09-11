@@ -1,7 +1,5 @@
-import { ResponsiveLine } from "@nivo/line";
 import { ICommit, IStudent } from "../../rest/types";
 import { StudentCalendar } from "../charts/students/StudentCalendar";
-import { formatCommitData } from "../charts/chartData";
 import { AllStudentTests } from "./charts/StudentTestBarChart";
 import { ReactNode } from "react";
 

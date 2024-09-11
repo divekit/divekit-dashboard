@@ -7,5 +7,6 @@ export const Color = {
   noCommits: "#ffd6bf",
   fewCommits: "#faac82",
   mostCommits: "#BB2585",
-  unfinishedTests: "#dedede"
+  unfinishedTests: "#dedede",
+  fraudMatch: "#edb1d8"
 }

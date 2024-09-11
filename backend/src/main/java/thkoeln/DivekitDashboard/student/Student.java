@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
@@ -13,6 +14,7 @@ public class Student {
     @Id
     @GeneratedValue
     private Long id;
+    private UUID uuid;
     private String name;
     private String codeRepoUrl;
     private String testRepoUrl;
@@ -24,11 +26,15 @@ public class Student {
     @ElementCollection
     private List<Commit> commits;
 
-    public Student(String name,
-                   String codeRepoUrl,
-                   String testRepoUrl,
-                   String testOverviewUrl,
-                   List<MilestoneTest> milestoneTests) {
+    public Student(
+            UUID uuid,
+            String name,
+            String codeRepoUrl,
+            String testRepoUrl,
+            String testOverviewUrl,
+            List<MilestoneTest> milestoneTests
+    ) {
+        this.uuid = uuid;
         this.name = name;
         this.codeRepoUrl = codeRepoUrl;
         this.testRepoUrl = testRepoUrl;

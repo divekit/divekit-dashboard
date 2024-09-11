@@ -8,7 +8,7 @@ group = 'th-koeln'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	sourceCompatibility = '17'
+	sourceCompatibility = '21'
 }
 
 configurations {
@@ -26,6 +26,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+	implementation 'commons-io:commons-io:2.16.1'
 	implementation 'org.postgresql:postgresql'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -33,6 +34,8 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	runtimeOnly 'com.h2database:h2'
 	implementation group: 'org.gitlab4j', name: 'gitlab4j-api', version: '6.0.0-rc.4'
+	implementation group: 'de.jplag', name: 'jplag', version: '5.1.0'
+	implementation group: 'de.jplag', name: 'java', version: '5.1.0'
 }
 
 tasks.named('test') {

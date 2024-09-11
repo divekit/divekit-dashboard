@@ -12,7 +12,7 @@ You can choose between building the project locally or running it with Docker.
 3. Set GITLAB_SERVER and GITLAB_TOKEN to your server URL and personal access token.
    - Other values such as the database login and container ports can be optionally changed as well.
 4. Run `docker compose up` in the root folder of the project.
-5. Access the site at http://localhost:3000/
+5. Access the site at http://localhost:8080/
 ### Build Locally
 #### Backend:
 1. Create and copy personal access token from GitLab. Default is found at
@@ -20,15 +20,27 @@ You can choose between building the project locally or running it with Docker.
 2. Import Gradle project from
     > /backend/build.gradle
 3. Sync Gradle project
-4. Edit run configuration to include environment variables `GITLAB_SERVER=` and `GITLAB_TOKEN=` with your server URL
+4. [Edit run configuration](https://www.jetbrains.com/help/objc/add-environment-variables-and-program-arguments.html#add-environment-variables) to include environment variables `GITLAB_SERVER=` and `GITLAB_TOKEN=` with your server URL
 and personal access token
 5. Run application (`DivekitDashboardApplication.java`) or run Gradle task `bootRun`
 
 #### Frontend:
 1. Run `yarn install`
 2. Run `npm start`
+3. Go into `./frontend/src/dashboard/service.ts` and set `BACKEND_URL` to `"http://localhost:8080"`
 3. Access the site at http://localhost:3000/
 <br />
+
+
+### Deployment
+1. If there are any code changes in the JPlag report-viewer, go into `./report-viewer` and run `npm run build`. Go into `./report-viewer/dist` and copy
+   over all files from that folder into `./frontend/public/report-viewer`.
+2. If there are any frontend changes (including the report viewer), also go into the `./frontend` folder and run `npm run build`. Go into
+`./frontend/build` and copy over all files from that folder into `./backend/src/main/resources/static`. This lets the backend 
+host the frontend of the dashboard.
+3. A new docker image can always be build with the included docker-compose and Dockerbuild files. Additionally, a new
+docker image is build and uploaded to Dockerhub each time a commit on the official repository is made. 
+
 
 ## Project Overview
 Divekit-Dashboard is a web application designed to track and visualize the progress of students through various milestones. 
@@ -114,6 +126,72 @@ commit count, commit calendar and timeline.
 
 <img src= "backend/src/main/resources/chart7.png" style="border: 2px solid #DEDEDE; border-radius: 5px;">
 
+#### Fraud Detection Warnings
+Displays potential fraud attempts by analyzing students using variable names, which are specified in the tasks of other repositories.
+Also shows students with matching variable names.
+
+<img src= "backend/src/main/resources/fraud_warnings.png" style="border: 2px solid #DEDEDE; border-radius: 5px;">
+## JPlag
+Divekit Dashboard features an integration with the software plagiarism detection software
+[JPlag](https://github.com/jplag/JPlag]). Milestone repositories can be analyzed to generate  plagiarism reports.
+Reports can be viewed with a local version of the [JPlag Report Viewer](https://jplag.github.io/JPlag/).
+
+All operations can be done from the dashboard.
+
+### Usage
+JPlag operations are found in the `JPlag` panel in the upper left corner. The panel lets users manage student repositories,
+set JPlag parameters, download JPlag reports and redirect the user to the JPlag report viewer.
+
+
+### Downloading Repositories
+For the JPlag report, copies of the repositories are required. Divekit Dashboard can download the needed repositories
+to the backend server. If a previous download of repositories exists, it will be replaced.
+1. Select a milestone for the download.
+2. Click download.
+
+After a few seconds, the download will be completed and relevant data about the repository size will be shown. The repositories
+can be deleted if they are not needed anymore.
+
+### Deleting Repositories
+This will irreversibly delete all repositories for the selected milestone. To get the repositories back, another download
+is required.
+
+1. Select a milestone to be deleted.
+2. Select "Delete Milestone Data".
+
+After a successful delete, a confirmation notification and an update of the repository size will be shown.
+
+### Setting JPlag parameters
+JPlag features various settings for configuration. Divekit Dashboard uses the default JPlag settings
+with these parameters adjusted:
+
+- Minimum Token Match: 15
+- Similarity Threshold: 0.3
+- Use Base code?: No
+
+The parameters can be further customized in the panel.
+### Creating a JPlag report
+This creates a JPlag report by running JPlag on the backend server. The downloaded file is a .zip-archive
+compatible with the JPlag report viewer.
+
+1. Select a milestone for the report.
+2. Download the repositories if none are downloaded yet.
+3. Adjust JPlag Parameters.
+4. Decide whether an automatic redirect to the JPlag report viewer should happen.
+    - If the download was started from the JPlag Report Viewer, the report will be automatically uploaded to the
+      JPlag Report Viewer and displayed.
+5. Select "Run JPlag Report".
+
+After a short amount of time, a JPlag report will be generated and downloaded to the user's file system. Depending
+on the setting the user will also get redirected to the JPlag Report viewer.
+
+Alternatively, the button
+"View JPlag Report Viewer" links to the online version of the report viewer with the latest features. The downloaded file
+can be manually uploaded there as well.
+
+
+
+
 
 
 ## Backend Overview
@@ -124,15 +202,16 @@ Processes REST requests for milestones.
 
 #### REST Endpoints:
 
-| Endpoint                      | Method | Description                                       |
-|-------------------------------|--------|---------------------------------------------------|
-| /milestones                   | GET    | Returns all milestones.                           |
-| /milestones/{id}              | GET    | Returns milestone with the specified ID.          |
-| /milestones/sources/**        | POST   | Posts a milestone link.                           |
-| /milestones/sources/paths/**  | GET    | Returns the paths of a specific milestone link.   |
-| /milestones/refresh           | GET    | Returns all milestones after a refresh.           |
-| /milestones/sources           | GET    | Returns all milestone sources.                    |
-| /milestones/sources/{id}      | DELETE | Removes all milestones with the specified source. |
+| Endpoint                     | Method | Description                                       |
+|------------------------------|--------|---------------------------------------------------|
+| /milestones                  | GET    | Returns all milestones.                           |
+| /milestones/{id}             | GET    | Returns milestone with the specified ID.          |
+| /milestones/sources/**       | POST   | Posts a milestone link.                           |
+| /milestones/sources/paths/** | GET    | Returns the paths of a specific milestone link.   |
+| /milestones/refresh          | GET    | Returns all milestones after a refresh.           |
+| /milestones/sources          | GET    | Returns all milestone sources.                    |
+| /milestones/{id}             | DELETE | Removes milestone with the specified ID.          |
+| /milestones/sources/{id}     | DELETE | Removes all milestones with the specified source. |
 
 
 ### GitlabParser class
@@ -170,6 +249,29 @@ Methods:
 - fetchStudentCommits: Sends a GET request to GitLab to request all commits made by a student for a particular repository. Removes the first commit as it’s auto-generated when creating the repository.
 - fetchHtmlString: Opens a URL connection to a student’s test pages to return the HTML as a String.
 
+### FraudMessageController class
+
+Processes REST requests for fraud messages.
+
+#### REST Endpoints:
+
+| Endpoint                 | Method | Description                                                                                     |
+|--------------------------|--------|-------------------------------------------------------------------------------------------------|
+| /fraud-messages          | POST   | Saves a fraud message.                                                                          |
+| /fraud-messages          | GET    | Returns all fraud messages.                                                                     |
+| /fraud-messages/students | GET    | Returns all fraud messages grouped by students.                                                 |
+| /fraud-messages/matches  | GET    | Returns a collection of students saved with other students, which have matching fraud warnings. |
+
+### FraudMessageService class
+
+Repsonsible for saving fraud messages, sorting them properly and finding students with matching warnings.
+
+Methods:
+
+- saveFraudMessage: Converts a fraud message string into a FraudMessage object and saves it.
+- groupFraudsByStudent: Groups fraud messages by students they belong to into separate lists.
+- getFraudMatches: Creates a map, where the keys are students and the values are collections of students with matching fraud warnings. These collections are also Maps, saving potential fraud partners as keys, along with the amount of matches found as values.
+
 ## Frontend Overview
 
 ### Directory Structure
@@ -205,11 +307,12 @@ each chart.
 
 ### Backend
 
-- Java 17 with Spring Boot and Gradle
+- Java 21 with Spring Boot and Gradle
 - Postgres database
 - GitLab4J API for working with the GitLab REST API
 
-![UML diagram](backend/src/main/resources/uml diagram.png)
+#### UML diagram
+<img src= "backend/src/main/resources/uml_diagram.png" style="border: 2px solid #DEDEDE; border-radius: 5px;">
 
 ### Frontend
 
